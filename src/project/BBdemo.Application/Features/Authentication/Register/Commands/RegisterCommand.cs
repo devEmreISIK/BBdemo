@@ -18,7 +18,6 @@ public class RegisterCommand : IRequest<AccessTokenDto>
     public string City { get; set; }
     public string Password { get; set; }
 
-    // Aynı emaile sahip bir kullanıcı var mı yok mu
 
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AccessTokenDto>
     {
@@ -44,20 +43,31 @@ public class RegisterCommand : IRequest<AccessTokenDto>
 
             if (emailUserCheck is not null)
             {
+                // Aynı emaile sahip bir kullanıcı var mı yok mu
                 throw new BusinessException("User email should be unique.");
             }
 
             IdentityResult result = await _userManager.CreateAsync(user, request.Password);
 
-            if (!result.Succeeded)
+            //if (!result.Succeeded)
+            //{
+            //    var errors = result.Errors.Select(x => x.Description).ToList();
+            //    throw new AuthorizationException(errors);
+            //}
+
+            if (result.Succeeded) 
             {
-                var errors = result.Errors.Select(x => x.Description).ToList();
-                throw new AuthorizationException(errors);
+                AccessTokenDto token = await _jwtService.CreateTokenAsync(emailUserCheck);
+
+                return token;
+
+            }
+            else
+            {
+                return new AccessTokenDto();
             }
 
-            AccessTokenDto token = await _jwtService.CreateTokenAsync(emailUserCheck);
-
-            return token;
+   
         }
     }
 }

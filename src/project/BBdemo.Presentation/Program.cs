@@ -17,6 +17,12 @@ builder.Services.AddApplicationServices();
 builder.Services.AddPersistanceServices(builder.Configuration);
 builder.Services.Configure<CustomTokenOptions>(builder.Configuration.GetSection("TokenOptions"));
 
+builder.Services.AddStackExchangeRedisCache(opt =>
+{
+    opt.Configuration = "localhost:6379";
+    opt.InstanceName = "BB_CACHE";
+});
+
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
 {
     opt.User.RequireUniqueEmail = true;

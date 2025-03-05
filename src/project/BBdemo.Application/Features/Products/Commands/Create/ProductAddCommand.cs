@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BBdemo.Application.Services.RedisServices;
 using BBdemo.Application.Services.Repositories;
 using BBdemo.Domain.Entities;
 using MediatR;
@@ -21,11 +22,13 @@ public class ProductAddCommand : IRequest<string>
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
+        private readonly IRedisService _redisService;
 
-        public ProductAddCommandHandler(IProductRepository productRepository, IMapper mapper)
+        public ProductAddCommandHandler(IProductRepository productRepository, IMapper mapper, IRedisService redisService)
         {
             _productRepository = productRepository;
             _mapper = mapper;
+            _redisService = redisService;
         }
 
         public async Task<string> Handle(ProductAddCommand request, CancellationToken cancellationToken)
@@ -33,6 +36,8 @@ public class ProductAddCommand : IRequest<string>
             Product product = _mapper.Map<Product>(request);
            
             await _productRepository.AddAsync(product, cancellationToken);
+
+            await _redisService.RemoveDataAsync("products");
 
             return "Product added.";
 
