@@ -14,8 +14,13 @@ public class AuthorizationException : Exception
         Errors.Add(message);
     }
 
-    public AuthorizationException(List<string> errors)
+    public AuthorizationException(List<string> errors) : base(BuildErrorMessage(errors))
     {
         Errors = errors;
+    }
+
+    private static string BuildErrorMessage(List<string> errors)
+    {
+        return string.Join("\n", errors);
     }
 }

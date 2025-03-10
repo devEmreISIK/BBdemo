@@ -3,6 +3,7 @@ using BBdemo.Application.Services.JwtServices;
 using BBdemo.Domain.Entities;
 using BBdemo.Persistance;
 using BBdemo.Persistance.Context;
+using BBdemo.Presentation.Middlewares;
 using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddApplicationServices();
 builder.Services.AddPersistanceServices(builder.Configuration);
 builder.Services.Configure<CustomTokenOptions>(builder.Configuration.GetSection("TokenOptions"));
+
+builder.Services.AddExceptionHandler<HttpExceptionHandler>();
 
 builder.Services.AddStackExchangeRedisCache(opt =>
 {
@@ -42,6 +45,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseExceptionHandler(_ => { });
 
 app.MapControllers();
 
